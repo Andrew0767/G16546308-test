@@ -3,14 +3,14 @@
         {
             "name": "G16546308",
             "includePath": [
-                "c:\\Users\\Andre\\Desktop\\G16546308 - 副本\\Core\\Inc",
-                "c:\\Users\\Andre\\Desktop\\G16546308 - 副本\\Drivers\\STM32G4xx_HAL_Driver\\Inc",
-                "c:\\Users\\Andre\\Desktop\\G16546308 - 副本\\Drivers\\STM32G4xx_HAL_Driver\\Inc\\Legacy",
-                "c:\\Users\\Andre\\Desktop\\G16546308 - 副本\\Drivers\\CMSIS\\Device\\ST\\STM32G4xx\\Include",
-                "c:\\Users\\Andre\\Desktop\\G16546308 - 副本\\Drivers\\CMSIS\\Include",
-                "c:\\Users\\Andre\\Desktop\\G16546308 - 副本\\MDK-ARM",
-                "c:\\Users\\Andre\\Desktop\\G16546308 - 副本\\Core\\Src",
-                "c:\\Users\\Andre\\Desktop\\G16546308 - 副本\\Drivers\\STM32G4xx_HAL_Driver\\Src"
+                "c:\\Users\\Andre\\Desktop\\G16546308-test\\Core\\Inc",
+                "c:\\Users\\Andre\\Desktop\\G16546308-test\\Drivers\\STM32G4xx_HAL_Driver\\Inc",
+                "c:\\Users\\Andre\\Desktop\\G16546308-test\\Drivers\\STM32G4xx_HAL_Driver\\Inc\\Legacy",
+                "c:\\Users\\Andre\\Desktop\\G16546308-test\\Drivers\\CMSIS\\Device\\ST\\STM32G4xx\\Include",
+                "c:\\Users\\Andre\\Desktop\\G16546308-test\\Drivers\\CMSIS\\Include",
+                "c:\\Users\\Andre\\Desktop\\G16546308-test\\MDK-ARM",
+                "c:\\Users\\Andre\\Desktop\\G16546308-test\\Core\\Src",
+                "c:\\Users\\Andre\\Desktop\\G16546308-test\\Drivers\\STM32G4xx_HAL_Driver\\Src"
             ],
             "defines": [
                 "USE_HAL_DRIVER",
