@@ -49,6 +49,7 @@
 /* USER CODE BEGIN PV */
 uint8_t key_value = 0;
 double adc1_value = 0,adc2_value = 0;
+double fp7 = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -167,6 +168,7 @@ double Adc2_Get(){//R37
 void Led_Control(int ledNum,int ledState){
 	static int status = 0xFF;
 	
+	
 	if(ledNum > 8 || ledNum < 1) return;
 	
 	if(ledState == 0){
@@ -182,14 +184,27 @@ void Led_Control(int ledNum,int ledState){
 }
 //
 void PwmPro(){
-	HAL_TIM_PWM_Start_IT(&htim2,TIM_CHANNEL_2);
-	
-	TIM2->ARR = 5000-1;//将tim2频率改为1000000/5000=200Hz
-	HAL_TIM_Base_Init(&htim2);
-	TIM2->CCR2 = 2500;//等于__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,200),将tim2通道2设为占空比为TIM2->CCR2/TIM2->ARR=40%
-	HAL_TIM_PWM_Stop_IT(&htim2,TIM_CHANNEL_2);
+//	HAL_TIM_PWM_Start_IT(&htim2,TIM_CHANNEL_2);
+//	
+//	TIM2->ARR = 5000-1;//将tim2频率改为1000000/5000=200Hz
+//	HAL_TIM_Base_Init(&htim2);
+//	TIM2->CCR2 = 2500;//等于__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,200),将tim2通道2设为占空比为TIM2->CCR2/TIM2->ARR=40%
+//	HAL_TIM_PWM_Stop_IT(&htim2,TIM_CHANNEL_2);
+	__HAL_TIM_SET_AUTORELOAD(&htim2,500);
+	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,200);
 }
 //
+uint16_t cap_up_count = 0,cap_down_count = 0;
+float cap_duty = 0;
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
+	if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2){
+		cap_up_count = HAL_TIM_ReadCapturedValue(&htim3,TIM_CHANNEL_2)+1;
+		cap_duty = (float)cap_down_count/cap_up_count;
+	}
+	if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1){
+		cap_down_count = HAL_TIM_ReadCapturedValue(&htim3,TIM_CHANNEL_1)+1;
+	}
+}
 //
 /* USER CODE END 0 */
 
@@ -226,11 +241,19 @@ int main(void)
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_TIM2_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   LCD_Init();
-	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_All,1);
-	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,1);
-	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,0);
+//	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_All,1);
+//	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,1);
+//	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,0);
+	
+	HAL_TIM_Base_Start(&htim3);
+	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
+	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
+	
+	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -241,12 +264,10 @@ int main(void)
 
     while (1)
     {
-			for(int i = 1;i<=8;i++){
-				Led_Control(i,1);
-				HAL_Delay(1000);
-				Led_Control(i,0);
-			}
-			/* USER CODE END WHILE */
+			PwmPro();
+			fp7 = 1000000/cap_up_count;
+			printf("%.3f,%.1f,%d\r\n",cap_duty,fp7,cap_up_count);
+    /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
     }
