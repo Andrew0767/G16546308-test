@@ -184,13 +184,12 @@ void Led_Control(int ledNum,int ledState){
 void PwmPro(){
 	HAL_TIM_PWM_Start_IT(&htim2,TIM_CHANNEL_2);
 	
-	TIM2->ARR = 500-1;//将tim2频率改为1000000/500=2000Hz
+	TIM2->ARR = 5000-1;//将tim2频率改为1000000/5000=200Hz
 	HAL_TIM_Base_Init(&htim2);
-	
-	TIM2->CCR2 = 200;//等于__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,200),将tim2通道2设为占空比为TIM2->CCR2/TIM2->ARR=40%
-	
+	TIM2->CCR2 = 2500;//等于__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,200),将tim2通道2设为占空比为TIM2->CCR2/TIM2->ARR=40%
 	HAL_TIM_PWM_Stop_IT(&htim2,TIM_CHANNEL_2);
 }
+//
 //
 /* USER CODE END 0 */
 
@@ -229,6 +228,9 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   LCD_Init();
+	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_All,1);
+	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,1);
+	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -239,8 +241,12 @@ int main(void)
 
     while (1)
     {
-			PwmPro();
-    /* USER CODE END WHILE */
+			for(int i = 1;i<=8;i++){
+				Led_Control(i,1);
+				HAL_Delay(1000);
+				Led_Control(i,0);
+			}
+			/* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
     }
