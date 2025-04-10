@@ -27,7 +27,7 @@ void Delay_LCD(u16 n)
 /*
 	uC8230��Һ���������Ĵ�������
 */
-void REG_8230_Init(void)
+void REG_8230_Init(void)//
 {
     LCD_WriteReg(0x0000, 0x0001);
     Delay_LCD(1000);

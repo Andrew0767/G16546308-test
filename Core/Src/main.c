@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -46,6 +47,7 @@
 
 /* USER CODE BEGIN PV */
 uint8_t key_value = 0;
+double adc1_value = 0,adc2_value = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,7 +63,7 @@ int fputc(int ch,FILE *p){
 	HAL_UART_Transmit(&huart1,(u8 *)&ch,1,HAL_MAX_DELAY);
 	return ch;
 }
-//
+// 按键扫描函数 返回值：0-未按下，1-单击，2-双击，3-长按，4-长按释放，5-长按释放后再次长按
 uint8_t Key_Scan(){
 	static struct{
 		uint8_t state;
@@ -144,6 +146,23 @@ else if(key_status[2].state == 1) {  // 按键3被按下但未释放
 	return 0;
 }
 //
+double Adc1_Get(){//R38
+	double adc = 0;
+	HAL_ADC_Start(&hadc1);
+	
+	adc = HAL_ADC_GetValue(&hadc1);
+	
+	return adc;
+}
+double Adc2_Get(){//R37
+	double adc = 0;
+	HAL_ADC_Start(&hadc2);
+	
+	adc = HAL_ADC_GetValue(&hadc2);
+	
+	return adc;
+}
+//
 /* USER CODE END 0 */
 
 /**
@@ -176,6 +195,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
+  MX_ADC1_Init();
+  MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
   LCD_Init();
   /* USER CODE END 2 */
@@ -188,24 +209,10 @@ int main(void)
 
     while (1)
     {
-			key_value = Key_Scan();
-			switch(key_value){
-				case 1:
-					printf("%d\r\n",key_value);
-					break;
-				case 2:
-					printf("%d\r\n",key_value);
-					break;
-				case 3:
-					printf("%d\r\n",key_value);
-					break;
-				case 5:
-					printf("%d\r\n",key_value);
-					break;
-				case 6:
-					printf("%d\r\n",key_value);
-					break;
-			}
+			adc2_value = Adc2_Get()*3.3f/4096;
+			adc1_value = Adc1_Get()*3.3f/4096;
+			printf("R37:%.2f\r\n",adc2_value);
+			printf("R38:%.2f\r\n",adc1_value);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -232,7 +239,13 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV2;
+  RCC_OscInitStruct.PLL.PLLN = 20;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
+  RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -242,12 +255,12 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
   {
     Error_Handler();
   }
