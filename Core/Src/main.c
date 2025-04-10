@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -163,6 +164,34 @@ double Adc2_Get(){//R37
 	return adc;
 }
 //
+void Led_Control(int ledNum,int ledState){
+	static int status = 0xFF;
+	
+	if(ledNum > 8 || ledNum < 1) return;
+	
+	if(ledState == 0){
+		status |= 0x01<<(ledNum - 1);
+	}
+	else if(ledState == 1){
+		status &= ~(0x01<<(ledNum-1));
+	}
+	
+	GPIOC->ODR = status<<8;
+	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,1);
+	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,0);
+}
+//
+void PwmPro(){
+	HAL_TIM_PWM_Start_IT(&htim2,TIM_CHANNEL_2);
+	
+	TIM2->ARR = 500-1;//将tim2频率改为1000000/500=2000Hz
+	HAL_TIM_Base_Init(&htim2);
+	
+	TIM2->CCR2 = 200;//等于__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,200),将tim2通道2设为占空比为TIM2->CCR2/TIM2->ARR=40%
+	
+	HAL_TIM_PWM_Stop_IT(&htim2,TIM_CHANNEL_2);
+}
+//
 /* USER CODE END 0 */
 
 /**
@@ -197,6 +226,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   LCD_Init();
   /* USER CODE END 2 */
@@ -209,10 +239,7 @@ int main(void)
 
     while (1)
     {
-			adc2_value = Adc2_Get()*3.3f/4096;
-			adc1_value = Adc1_Get()*3.3f/4096;
-			printf("R37:%.2f\r\n",adc2_value);
-			printf("R38:%.2f\r\n",adc1_value);
+			PwmPro();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
