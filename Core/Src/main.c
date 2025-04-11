@@ -63,160 +63,160 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 //
-int fputc(int ch,FILE *p){
-	HAL_UART_Transmit(&huart1,(u8 *)&ch,1,HAL_MAX_DELAY);
-	return ch;
-}
-// 按键扫描函数 返回值：0-未按下，1-单击，2-双击，3-长按，4-长按释放，5-长按释放后再次长按
-uint8_t Key_Scan(){
-	static struct{
-		uint8_t state;
-		uint32_t timestamp;
-		uint8_t click_count;  
-		uint32_t last_release_time;
-	}key_status[4] = {0};
-	
-	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_0) == 0){//普通消抖
-		if(key_status[0].state == 0){
-			key_status[0].state = 1;
-			key_status[0].timestamp = uwTick;
-		}
-		else if(key_status[0].state == 1&&(uwTick - key_status[0].timestamp) > 100){
-			key_status[0].state = 2;
-		}
-	}
-	else if(key_status[0].state == 2){
-		key_status[0].state = 0;
-		return 1;
-	}
-	
-	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_1) == 0){
-		if(key_status[1].state == 0){
-			key_status[1].state = 1;
-			key_status[1].timestamp = uwTick;
-		}
-		else if(key_status[1].state == 1){
-			if((uwTick - key_status[1].timestamp) > 100){
-				key_status[1].state = 2;
-				key_status[1].timestamp = uwTick;
-			}
-		}
-		else if(key_status[1].state == 2){
-			if((uwTick - key_status[1].timestamp) > 1000){
-				key_status[1].state = 3;
-				return 5;
-			}
-		}
-	}
-	else if(key_status[1].state >= 2){
-		if(key_status[1].state == 2){
-			key_status[1].state = 0;
-			return 2;
-		}
-		key_status[1].state = 0;
-	}
-	
-	
-  if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) == 0) {  // 按键3被按下
-    if(key_status[2].state == 0) {
-        key_status[2].state = 1;  // 按下状态
-        key_status[2].timestamp = uwTick;
-    }
-    else if(key_status[2].state == 1 && (uwTick - key_status[2].timestamp) > 1000) {
-        key_status[2].state = 2;  // 长按状态
-    }
-}
-else if(key_status[2].state == 2) {  // 按键3被释放
-    key_status[2].state = 0;
-    return 3;  // 返回按键3的值（单击）
-}
-else if(key_status[2].state == 1) {  // 按键3被按下但未释放
-    key_status[2].state = 0;
-    key_status[2].click_count++;  // 增加点击计数
-    key_status[2].last_release_time = uwTick;  // 记录释放时间
+//int fputc(int ch,FILE *p){
+//	HAL_UART_Transmit(&huart1,(u8 *)&ch,1,HAL_MAX_DELAY);
+//	return ch;
+//}
+//// 按键扫描函数 返回值：0-未按下，1-单击，2-双击，3-长按，4-长按释放，5-长按释放后再次长按
+//uint8_t Key_Scan(){
+//	static struct{
+//		uint8_t state;
+//		uint32_t timestamp;
+//		uint8_t click_count;  
+//		uint32_t last_release_time;
+//	}key_status[4] = {0};
+//	
+//	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_0) == 0){//普通消抖
+//		if(key_status[0].state == 0){
+//			key_status[0].state = 1;
+//			key_status[0].timestamp = uwTick;
+//		}
+//		else if(key_status[0].state == 1&&(uwTick - key_status[0].timestamp) > 100){
+//			key_status[0].state = 2;
+//		}
+//	}
+//	else if(key_status[0].state == 2){
+//		key_status[0].state = 0;
+//		return 1;
+//	}
+//	
+//	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_1) == 0){
+//		if(key_status[1].state == 0){
+//			key_status[1].state = 1;
+//			key_status[1].timestamp = uwTick;
+//		}
+//		else if(key_status[1].state == 1){
+//			if((uwTick - key_status[1].timestamp) > 100){
+//				key_status[1].state = 2;
+//				key_status[1].timestamp = uwTick;
+//			}
+//		}
+//		else if(key_status[1].state == 2){
+//			if((uwTick - key_status[1].timestamp) > 1000){
+//				key_status[1].state = 3;
+//				return 5;
+//			}
+//		}
+//	}
+//	else if(key_status[1].state >= 2){
+//		if(key_status[1].state == 2){
+//			key_status[1].state = 0;
+//			return 2;
+//		}
+//		key_status[1].state = 0;
+//	}
+//	
+//	
+//  if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_2) == 0) {  // 按键3被按下
+//    if(key_status[2].state == 0) {
+//        key_status[2].state = 1;  // 按下状态
+//        key_status[2].timestamp = uwTick;
+//    }
+//    else if(key_status[2].state == 1 && (uwTick - key_status[2].timestamp) > 1000) {
+//        key_status[2].state = 2;  // 长按状态
+//    }
+//}
+//else if(key_status[2].state == 2) {  // 按键3被释放
+//    key_status[2].state = 0;
+//    return 3;  // 返回按键3的值（单击）
+//}
+//else if(key_status[2].state == 1) {  // 按键3被按下但未释放
+//    key_status[2].state = 0;
+//    key_status[2].click_count++;  // 增加点击计数
+//    key_status[2].last_release_time = uwTick;  // 记录释放时间
 
-    if(key_status[2].click_count == 2 && (uwTick - key_status[2].last_release_time) < 200) {  // 双击检测时间间隔调整为200毫秒
-        key_status[2].click_count = 0;  // 重置点击计数
-        return 6;  // 返回6表示双击
-    }
-    else if(key_status[2].click_count == 1&& (uwTick - key_status[2].last_release_time) > 1000) { 
-       // 单击检测时间间隔调整为200毫秒
-        key_status[2].click_count = 0;  // 重置点击计数
-        key_status[2].state = 0;  // 重置状态
-        return 3;  // 返回3表示单击
-    }
-}
-	
-	return 0;
-}
-//
-double Adc1_Get(){//R38
-	double adc = 0;
-	HAL_ADC_Start(&hadc1);
-	
-	adc = HAL_ADC_GetValue(&hadc1);
-	
-	return adc;
-}
-double Adc2_Get(){//R37
-	double adc = 0;
-	HAL_ADC_Start(&hadc2);
-	
-	adc = HAL_ADC_GetValue(&hadc2);
-	
-	return adc;
-}
-//
-void Led_Control(int ledNum,int ledState){
-	static int status = 0xFF;
-	
-	
-	if(ledNum > 8 || ledNum < 1) return;
-	
-	if(ledState == 0){
-		status |= 0x01<<(ledNum - 1);
-	}
-	else if(ledState == 1){
-		status &= ~(0x01<<(ledNum-1));
-	}
-	
-	GPIOC->ODR = status<<8;
-	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,1);
-	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,0);
-}
-//
-void PwmPro(){
+//    if(key_status[2].click_count == 2 && (uwTick - key_status[2].last_release_time) < 200) {  // 双击检测时间间隔调整为200毫秒
+//        key_status[2].click_count = 0;  // 重置点击计数
+//        return 6;  // 返回6表示双击
+//    }
+//    else if(key_status[2].click_count == 1&& (uwTick - key_status[2].last_release_time) > 1000) { 
+//       // 单击检测时间间隔调整为200毫秒
+//        key_status[2].click_count = 0;  // 重置点击计数
+//        key_status[2].state = 0;  // 重置状态
+//        return 3;  // 返回3表示单击
+//    }
+//}
+//	
+//	return 0;
+//}
+////
+//double Adc1_Get(){//R38
+//	double adc = 0;
+//	HAL_ADC_Start(&hadc1);
+//	
+//	adc = HAL_ADC_GetValue(&hadc1);
+//	
+//	return adc;
+//}
+//double Adc2_Get(){//R37
+//	double adc = 0;
+//	HAL_ADC_Start(&hadc2);
+//	
+//	adc = HAL_ADC_GetValue(&hadc2);
+//	
+//	return adc;
+//}
+////
+//void Led_Control(int ledNum,int ledState){
+//	static int status = 0xFF;
+//	
+//	
+//	if(ledNum > 8 || ledNum < 1) return;
+//	
+//	if(ledState == 0){
+//		status |= 0x01<<(ledNum - 1);
+//	}
+//	else if(ledState == 1){
+//		status &= ~(0x01<<(ledNum-1));
+//	}
+//	
+//	GPIOC->ODR = status<<8;
+//	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,1);
+//	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,0);
+//}
+////
+//void PwmPro(){
 //	HAL_TIM_PWM_Start_IT(&htim2,TIM_CHANNEL_2);
 //	
 //	TIM2->ARR = 5000-1;//将tim2频率改为1000000/5000=200Hz
 //	HAL_TIM_Base_Init(&htim2);
 //	TIM2->CCR2 = 2500;//等于__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,200),将tim2通道2设为占空比为TIM2->CCR2/TIM2->ARR=40%
 //	HAL_TIM_PWM_Stop_IT(&htim2,TIM_CHANNEL_2);
-	__HAL_TIM_SET_AUTORELOAD(&htim2,500);
-	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,200);
-}
-//
-uint16_t cap_up_count = 0,cap_down_count = 0;
-float cap_duty = 0;
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
-	if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2){
-		cap_up_count = HAL_TIM_ReadCapturedValue(&htim3,TIM_CHANNEL_2)+1;
-		cap_duty = (float)cap_down_count/cap_up_count;
-	}
-	if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1){
-		cap_down_count = HAL_TIM_ReadCapturedValue(&htim3,TIM_CHANNEL_1)+1;
-	}
-}
-//
-uint8_t uart_rx_buf[64] = {0};
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-	if(uart_rx_buf[0] == 'a'){
-		x24c02_write(0,0);
-		HAL_Delay(5);
-		printf("%d\r\n",x24c02_read(0));
-	}
-	HAL_UART_Receive_IT(&huart1,uart_rx_buf,1);
-}
+//	__HAL_TIM_SET_AUTORELOAD(&htim2,500);
+//	__HAL_TIM_SetCompare(&htim2,TIM_CHANNEL_2,200);
+//}
+////
+//uint16_t cap_up_count = 0,cap_down_count = 0;
+//float cap_duty = 0;
+//void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
+//	if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2){
+//		cap_up_count = HAL_TIM_ReadCapturedValue(&htim3,TIM_CHANNEL_2)+1;
+//		cap_duty = (float)cap_down_count/cap_up_count;
+//	}
+//	if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1){
+//		cap_down_count = HAL_TIM_ReadCapturedValue(&htim3,TIM_CHANNEL_1)+1;
+//	}
+//}
+////
+//uint8_t uart_rx_buf[64] = {0};
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+//	if(uart_rx_buf[0] == 'a'){
+//		x24c02_write(0,0);
+//		HAL_Delay(5);
+//		printf("%d\r\n",x24c02_read(0));
+//	}
+//	HAL_UART_Receive_IT(&huart1,uart_rx_buf,1);
+//}
 //
 //uint8_t uart_rx_dma_buf[64];
 //void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
@@ -229,6 +229,17 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 //	}
 //	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,uart_rx_dma_buf,sizeof(uart_rx_dma_buf));
 //	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+//}
+//
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+//	static int time_ms = 0;
+//	if(htim == &htim16){
+//		time_ms++;
+//		if(time_ms == 1000){
+//			printf("%d\r\n",time_ms);
+//			time_ms = 0;
+//		}
+//	}
 //}
 //
 /* USER CODE END 0 */
@@ -268,21 +279,24 @@ int main(void)
   MX_ADC2_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_TIM16_Init();
   /* USER CODE BEGIN 2 */
   LCD_Init();
-	I2CInit();
+//	I2CInit();
 //	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_All,1);
 //	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,1);
 //	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,0);
 	
-	HAL_TIM_Base_Start(&htim3);
-	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
-	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
-	
-	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
-	HAL_UART_Receive_IT(&huart1,uart_rx_buf,1);
+//	HAL_TIM_Base_Start(&htim3);
+//	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_1);
+//	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
+//	
+//	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
+//	HAL_UART_Receive_IT(&huart1,uart_rx_buf,1);
 //	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,uart_rx_dma_buf,sizeof(uart_rx_dma_buf));
 //	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+//	HAL_TIM_Base_Start_IT(&htim16);
+	
   /* USER CODE END 2 */
 
   /* Infinite loop */
