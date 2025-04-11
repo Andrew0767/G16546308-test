@@ -4,6 +4,7 @@
 "g16546308\main.o"
 "g16546308\gpio.o"
 "g16546308\adc.o"
+"g16546308\dma.o"
 "g16546308\tim.o"
 "g16546308\usart.o"
 "g16546308\stm32g4xx_it.o"

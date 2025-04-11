@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -41,7 +42,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+extern DMA_HandleTypeDef hdma_usart1_rx;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -206,7 +207,27 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 	}
 }
 //
-/* USER CODE END 0 */
+//uint8_t uart_rx_buf[64] = {0};
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+//	if(uart_rx_buf[0] == 'a'&&uart_rx_buf[1] == 'b')
+//		printf("OK");
+//	
+//	HAL_UART_Receive_IT(&huart1,uart_rx_buf,3);
+//}
+//
+uint8_t uart_rx_dma_buf[64];
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
+	if(huart == &huart1){
+		if(uart_rx_dma_buf[0] == '1'&&uart_rx_dma_buf[1] == '2'&&uart_rx_dma_buf[4] == '5')
+			printf("ok!");
+		else
+			printf("error!");
+	}
+	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,uart_rx_dma_buf,sizeof(uart_rx_dma_buf));
+	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+}
+//
+/*USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
@@ -237,6 +258,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART1_UART_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
@@ -253,7 +275,9 @@ int main(void)
 	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
 	
 	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
-
+//	HAL_UART_Receive_IT(&huart1,uart_rx_buf,1);
+	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,uart_rx_dma_buf,sizeof(uart_rx_dma_buf));
+	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -264,9 +288,6 @@ int main(void)
 
     while (1)
     {
-			PwmPro();
-			fp7 = 1000000/cap_up_count;
-			printf("%.3f,%.1f,%d\r\n",cap_duty,fp7,cap_up_count);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
