@@ -1,6 +1,7 @@
 --cpu=Cortex-M4.fp.sp
 "g16546308\startup_stm32g431xx.o"
 "g16546308\lcd.o"
+"g16546308\i2c_hal.o"
 "g16546308\main.o"
 "g16546308\gpio.o"
 "g16546308\adc.o"

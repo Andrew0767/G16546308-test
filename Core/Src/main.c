@@ -28,7 +28,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdio.h"
-
+#include "i2c_hal.h"
+#include "string.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -207,27 +208,30 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
 	}
 }
 //
-//uint8_t uart_rx_buf[64] = {0};
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-//	if(uart_rx_buf[0] == 'a'&&uart_rx_buf[1] == 'b')
-//		printf("OK");
-//	
-//	HAL_UART_Receive_IT(&huart1,uart_rx_buf,3);
-//}
-//
-uint8_t uart_rx_dma_buf[64];
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
-	if(huart == &huart1){
-		if(uart_rx_dma_buf[0] == '1'&&uart_rx_dma_buf[1] == '2'&&uart_rx_dma_buf[4] == '5')
-			printf("ok!");
-		else
-			printf("error!");
+uint8_t uart_rx_buf[64] = {0};
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+	if(uart_rx_buf[0] == 'a'){
+		x24c02_write(0,0);
+		HAL_Delay(5);
+		printf("%d\r\n",x24c02_read(0));
 	}
-	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,uart_rx_dma_buf,sizeof(uart_rx_dma_buf));
-	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+	HAL_UART_Receive_IT(&huart1,uart_rx_buf,1);
 }
 //
-/*USER CODE END 0 */
+//uint8_t uart_rx_dma_buf[64];
+//void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size){
+//	if(huart == &huart1){
+//		if(uart_rx_dma_buf[0] == '1'&&uart_rx_dma_buf[1] == '2'&&uart_rx_dma_buf[4] == '5')
+//			printf("ok!");
+//		else
+//			printf("error!");
+//				memset(uart_rx_dma_buf,0,sizeof(uart_rx_dma_buf));
+//	}
+//	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,uart_rx_dma_buf,sizeof(uart_rx_dma_buf));
+//	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+//}
+//
+/* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
@@ -266,6 +270,7 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   LCD_Init();
+	I2CInit();
 //	HAL_GPIO_WritePin(GPIOC,GPIO_PIN_All,1);
 //	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,1);
 //	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_2,0);
@@ -275,9 +280,9 @@ int main(void)
 	HAL_TIM_IC_Start_IT(&htim3, TIM_CHANNEL_2);
 	
 	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
-//	HAL_UART_Receive_IT(&huart1,uart_rx_buf,1);
-	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,uart_rx_dma_buf,sizeof(uart_rx_dma_buf));
-	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
+	HAL_UART_Receive_IT(&huart1,uart_rx_buf,1);
+//	HAL_UARTEx_ReceiveToIdle_DMA(&huart1,uart_rx_dma_buf,sizeof(uart_rx_dma_buf));
+//	__HAL_DMA_DISABLE_IT(&hdma_usart1_rx,DMA_IT_HT);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -285,7 +290,6 @@ int main(void)
     LCD_SetBackColor(Black);
     LCD_SetTextColor(White);
 		LCD_Clear(Black);
-
     while (1)
     {
     /* USER CODE END WHILE */
