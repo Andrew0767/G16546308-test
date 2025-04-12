@@ -21,17 +21,21 @@ Target DLL:      CMSIS_AGDI.dll V1.33.22.0
 Dialog DLL:      TCM.DLL V1.56.6.0
  
 <h2>Project:</h2>
-C:\Users\Andre\Desktop\G16546308-test\MDK-ARM\G16546308.uvprojx
-Project File Date:  04/11/2025
+C:\Users\Andre\Desktop\G165463081\MDK-ARM\G16546308.uvprojx
+Project File Date:  04/12/2025
 
 <h2>Output:</h2>
 *** Using Compiler 'V6.23', folder: 'D:\APP\keil\Keil_MDK\ARM\ARMCLANG\Bin'
 Build target 'G16546308'
+../Core/Src/main.c(296): error: redefinition of 'HAL_TIM_IC_CaptureCallback'
+  296 | void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+      |      ^
+../Core/Src/main.c(202): note: previous definition is here
+  202 | void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
+      |      ^
+1 error generated.
 compiling main.c...
-linking...
-Program Size: Code=27584 RO-data=592 RW-data=20 ZI-data=1868  
-FromELF: creating hex file...
-"G16546308\G16546308.axf" - 0 Error(s), 0 Warning(s).
+"G16546308\G16546308.axf" - 1 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -55,7 +59,8 @@ Package Vendor: Keil
 
    * Component: ARM::CMSIS:CORE@6.1.0
       Include file:  CMSIS/Core/Include/tz_context.h
-Build Time Elapsed:  00:00:00
+Target not created.
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>
